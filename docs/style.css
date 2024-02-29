@@ -33,7 +33,7 @@ th {
 }
 
 tr:nth-child(even) {
-    background-color: #f2f2f2;
+    background-color: #6C7A89; /* Grass green */
 }
 
 tr:hover {
