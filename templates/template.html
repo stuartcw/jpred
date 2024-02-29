@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<html>
+<head>
+    <title>Database Query Results</title>
+</head>
+<body>
+    <div class="content">
+    {% for column, results in data.items() %}
+    <h2>Results for {{ column }}</h2>
+    <table border="1">
+        <tr>
+            <th>Value</th>
+            <th>Count</th>
+        </tr>
+        {% for value, count in results %}
+        <tr>
+            <td>{{ value }}</td>
+            <td>{{ count }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+    {% endfor %}
+    </div>
+</body>
+</html>
