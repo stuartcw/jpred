@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<html>
+<head>
+    <title>All Entrants</title>
+</head>
+<body>
+    <div class="content">
+    <h1><a href="/">JPred 2024</a></h1>
+    <h2>All Entrants</h2>
+    <p>By order of entry.</p>
+    {% for name in names %}
+    <ul>
+        <li><a href="preds/{{name}}.html">{{ name }}</a></li>
+    </ul>
+    {% endfor %}
+    </div>
+</body>
+</html>
