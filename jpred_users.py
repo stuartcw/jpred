@@ -79,7 +79,7 @@ def write_one_user(conn,name,html_filename,env):
                     for column in columns:
                         #j1 = { key:value for key, value in row_dict.items() if key.startswith("J1") }
                         #ic(column,row[column])
-                        table_row.append((column,row[column]))
+                        table_row.append((column.title(),row[column]))
                     #ic(30*"-")
                     predictions[league]=table_row
 
