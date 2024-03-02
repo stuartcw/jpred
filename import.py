@@ -27,7 +27,7 @@ def csv_to_sqlite(csv_file_path, sqlite_db_path, table_name):
 
 # Example usage
 if __name__ == "__main__":
-    csv_file_path = 'JPred 2024.csv'  # Update this to the path of your CSV file
+    csv_file_path = 'JPred 2024 - Form responses 1.csv'  # Update this to the path of your CSV file
     sqlite_db_path = 'jpred.db'  # Update this to your SQLite database path
     table_name = 'jpred'  # Define the table name you want to use
 
