@@ -1,9 +1,26 @@
-_body {
-    background-color: #4CAF50; /* White */
-    font-family: Arial, sans-serif;
-    color: #333;
-    padding: 20px;
-}
+/* Style for unvisited links */
+a:link {
+    text-decoration: none; /* Removes the underline */
+    color: #008000; /* Green color for unvisited links */
+  }
+  
+  /* Style for visited links */
+  a:visited {
+    text-decoration: none; /* Removes the underline */
+    color: #006400; /* Darker green color for visited links */
+  }
+  
+  /* Style for links when mouse hovers over them */
+  a:hover {
+    text-decoration: underline; /* Optionally add underline on hover for clarity */
+    color: #004d00; /* Even darker green for hover state */
+  }
+  
+  /* Style for active links (when clicked) */
+  a:active {
+    text-decoration: none;
+    color: #003300; /* Very dark green for active state */
+  }
 
 body {
     font-family: Arial, sans-serif;
