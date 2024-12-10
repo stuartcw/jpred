@@ -1,4 +1,4 @@
-#!venv/bin/python3
+#!/usr/bin/env python3
 import click
 import sqlite3
 from jinja2 import Environment, FileSystemLoader
