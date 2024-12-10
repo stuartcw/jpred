@@ -3,3 +3,6 @@ lib/*
 include/*
 bin/*
 pyvenv.cfg
+*.csv
+docs/.DS_Store
+jpred.db
