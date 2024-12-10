@@ -88,3 +88,13 @@ tr:hover {
     background-color: #ddd;
 }
 
+.center {
+    text-align: center; /* Center content horizontally */
+}
+.left {
+    text-align: left; /* Left-align content */
+}
+.right {
+    text-align: right; /* Right-align content */
+}
+
