@@ -18,6 +18,15 @@ def query_database(conn, column):
     cur.execute(f"""SELECT "{column}", COUNT(*) as count FROM jpred GROUP BY "{column}" ORDER BY count DESC""")
     return cur.fetchall()
 
+def custom_title_case(text):
+    exceptions = {"and", "the", "of", "in", "on"}
+    words = text.split()
+    result = [
+        word.capitalize() if word.lower() not in exceptions or i == 0 else word.lower()
+        for i, word in enumerate(words)
+    ]
+    return " ".join(result)
+
 @click.command()
 @click.argument('html_filename')
 @click.argument('columns_file')
@@ -31,7 +40,7 @@ def main(html_filename, columns_file):
         data = {}
         for column in columns:
             results = query_database(conn, column)
-            data[column] = results
+            data[custom_title_case(column)] = results
 
         # Load Jinja environment and template
         env = Environment(loader=FileSystemLoader('.'))
