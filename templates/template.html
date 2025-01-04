@@ -20,16 +20,16 @@
     <h2>All Entrants</h2>
     <a href="users.html">Individual Entrants</a>
     {% for column, results in data.items() %}
-    <h2>Results for {{ column }}</h2>
+    <h2>Predictions for {{ column }}</h2>
     <table border="1">
         <tr>
             <th>Team</th>
-            <th>Count</th>
+            <th># of Predictions</th>
         </tr>
         {% for value, count in results %}
         <tr>
-            <td>{{ value }}</td>
-            <td>{{ count }}</td>
+            <td data-label="Team">{{ value }}</td>
+            <td data-label="# of Predictions">{{ count }}</td>
         </tr>
         {% endfor %}
     </table>
