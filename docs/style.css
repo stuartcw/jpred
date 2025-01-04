@@ -3,8 +3,10 @@
 
 body {
     font-family: 'Montserrat', sans-serif;
-    background-image: linear-gradient(0deg, green 20%, #006400 60%, #006400 40%, green 10%);
-    background-size: 100% 80px;
+    /*background-image: linear-gradient(0deg, green 20%, #006400 60%, #006400 40%, green 10%);
+    background-size: 100% 80px;*/
+    background-image: linear-gradient(0deg, green 25%, #006400 25%, #006400 50%, green 50%);
+    background-size: 100% 100px; /* Repeat pattern every 40px horizontally */
     min-height: 100vh;
     margin: 0;
     padding: 20px;
@@ -26,14 +28,17 @@ a:link {
     text-decoration: none;
     color: #008000;
 }
+
 a:visited {
     text-decoration: none;
     color: #006400;
 }
+
 a:hover {
     text-decoration: underline;
     color: #004d00;
 }
+
 a:active {
     text-decoration: none;
     color: #003300;
@@ -118,7 +123,31 @@ tr:hover {
     }
 }
 
+/* Desktop-specific styles */
+@media (min-width: 768px) {
+    .content {
+        padding: 15px;
+        width: 33%; /* Set table width to one-third of the screen */
+        margin: 0 auto; /* Center table horizontally */
+    }
+}
+
+/* Mobile-specific styles */
 @media (max-width: 480px) {
+
+    h1 {
+        font-size: 2rem;
+    }
+
+    h2 {
+        font-size: 1.8rem;
+    }
+
+    h3 {
+        font-size: 1.5rem;
+    }
+
+
     table {
         display: block;
         overflow-x: auto;
