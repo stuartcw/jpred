@@ -6,3 +6,7 @@ pyvenv.cfg
 *.csv
 docs/.DS_Store
 jpred.db
+.DS_Store
+*/.DS_Store
+*.log
+_site
