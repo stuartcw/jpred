@@ -4,7 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
-    <link rel="stylesheet" href="style.css?v=1">
+    <link rel="stylesheet" href="style.css?v=2">
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    <link rel="manifest" href="/site.webmanifest">
 </head>
 <html>
 <head>
@@ -30,13 +34,13 @@
         <tbody>
         {% for entry in ordered_leaderboard %}
         <tr>
-            <td class="center">{{ loop.index }}</td>
-            <td class="left"><a href="preds/{{ entry[1] }}.html">{{ entry[1] }}</a></td>
-            <td class="center">{{ entry[0] }}</td>
-            <td class="center">{{ entry[2]["total_exact_matches"] }}</td>
-            <td class="center">{{ entry[2]["j1"] }}</td>
-            <td class="center">{{ entry[2]["j2"] }}</td>
-            <td class="center">{{ entry[2]["j3"] }}</td>
+            <td class="center" data-label="Rank">{{ loop.index }}</td>
+            <td class="left" data-label="Name"><a href="preds/{{ entry[1] }}.html">{{ entry[1] }}</a></td>
+            <td class="center" data-label="Points">{{ entry[0] }}</td>
+            <td class="center" data-label="Exact">{{ entry[2]["total_exact_matches"] }}</td>
+            <td class="center" data-label="J1">{{ entry[2]["j1"] }}</td>
+            <td class="center" data-label="J2">{{ entry[2]["j2"] }}</td>
+            <td class="center" data-label="J3">{{ entry[2]["j3"] }}</td>
         </tr>
         {% endfor %}
         <tbody>
