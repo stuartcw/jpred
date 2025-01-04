@@ -1,63 +1,42 @@
-/* Style for unvisited links */
+/* Base styles */
 @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap');
-
-
-h1, h2, h3, h4, h5, h6 {
-    font-family: 'Montserrat', sans-serif;
-    font-weight: 700; /* Makes headings bold */
-}
-
-p, li, a, and other elements {
-    font-weight: 400; /* Regular weight for body text */
-}
-
-a:link {
-    text-decoration: none; /* Removes the underline */
-    color: #008000; /* Green color for unvisited links */
-  }
-  
-  /* Style for visited links */
-  a:visited {
-    text-decoration: none; /* Removes the underline */
-    color: #006400; /* Darker green color for visited links */
-  }
-  
-  /* Style for links when mouse hovers over them */
-  a:hover {
-    text-decoration: underline; /* Optionally add underline on hover for clarity */
-    color: #004d00; /* Even darker green for hover state */
-  }
-  
-  /* Style for active links (when clicked) */
-  a:active {
-    text-decoration: none;
-    color: #003300; /* Very dark green for active state */
-  }
 
 body {
     font-family: 'Montserrat', sans-serif;
-    /* Define the background as a linear gradient */
-    background-image: linear-gradient(0deg, /* 0 degrees makes the stripes horizontal */
-                      green 20%, /* First color: green, takes up 20% */
-                      #006400 60%, /* Second color: a darker green, starts at 20% */
-                      #006400 40%, /* Second color extends to 40%, making each stripe's width 20% of the container */
-                      green 10%); /* Back to first color to continue the pattern */
-    
-    /* Repeat the background vertically to fill the entire page */
-    background-size: 100% 80px; /* Adjust the height (80px) to make the stripes wider or narrower */
-    
-    /* Ensure the background covers the entire page */
+    background-image: linear-gradient(0deg, green 20%, #006400 60%, #006400 40%, green 10%);
+    background-size: 100% 80px;
     min-height: 100vh;
     margin: 0;
     padding: 20px;
-  }
-  
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700;
+}
 
 .content {
     background-color: #fff;
     padding: 20px;
     border-radius: 10px;
     box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+
+a:link {
+    text-decoration: none;
+    color: #008000;
+}
+a:visited {
+    text-decoration: none;
+    color: #006400;
+}
+a:hover {
+    text-decoration: underline;
+    color: #004d00;
+}
+a:active {
+    text-decoration: none;
+    color: #003300;
 }
 
 table {
@@ -67,7 +46,7 @@ table {
 }
 
 table, th, td {
-    border: 2px solid #fff; /* White lines for the soccer pitch */
+    border: 2px solid #fff;
 }
 
 th, td {
@@ -76,7 +55,7 @@ th, td {
 }
 
 th {
-    background-color: #4CAF50; /* Darker green for headers */
+    background-color: #4CAF50;
     color: white;
 }
 
@@ -89,12 +68,92 @@ tr:hover {
 }
 
 .center {
-    text-align: center; /* Center content horizontally */
+    text-align: center;
 }
 .left {
-    text-align: left; /* Left-align content */
+    text-align: left;
 }
 .right {
-    text-align: right; /* Right-align content */
+    text-align: right;
 }
 
+/* Responsive design */
+@media (max-width: 768px) {
+    body {
+        padding: 10px;
+    }
+
+    .content {
+        padding: 15px;
+    }
+
+    table {
+        font-size: 12px;
+    }
+
+    th, td {
+        padding: 6px;
+    }
+
+    th, td, table {
+        border: none;
+    }
+
+    tr {
+        display: block;
+        margin-bottom: 15px;
+    }
+
+    th, td {
+        display: block;
+        text-align: left;
+    }
+
+    td {
+        border-bottom: 1px solid #ddd;
+    }
+
+    a {
+        word-wrap: break-word;
+    }
+}
+
+@media (max-width: 480px) {
+    table {
+        display: block;
+        overflow-x: auto;
+    }
+
+    tbody tr {
+        display: flex;
+        flex-direction: column;
+        border: 1px solid #ddd;
+        margin-bottom: 15px;
+    }
+
+    th, td {
+        display: block;
+        padding: 10px;
+        text-align: left;
+    }
+
+    td {
+        font-size: 14px;
+        border-bottom: 1px solid #ddd;
+    }
+
+    td:last-child {
+        border-bottom: none;
+    }
+
+    th {
+        display: none;
+    }
+
+    tbody tr td::before {
+        content: attr(data-label);
+        font-weight: bold;
+        display: inline-block;
+        width: 50%;
+    }
+}
