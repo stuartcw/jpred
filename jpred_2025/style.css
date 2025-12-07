@@ -45,9 +45,11 @@ a:active {
 }
 
 table {
-    width: 100%;
+    width: auto;
+    min-width: 100%;
     border-collapse: collapse;
     margin-top: 20px;
+    table-layout: auto;
 }
 
 table, th, td {
@@ -124,11 +126,40 @@ tr:hover {
 }
 
 /* Desktop-specific styles */
-@media (min-width: 768px) {
+@media (min-width: 1400px) {
+    .content {
+        padding: 20px;
+        width: fit-content; /* Fit to content width */
+        max-width: min(33%, 600px); /* Cap at 33% or 600px for homepage */
+        margin: 0 auto; /* Center horizontally */
+    }
+    
+    /* Wider content for pages with tables */
+    body:has(table) .content {
+        max-width: 1200px;
+    }
+}
+
+@media (min-width: 768px) and (max-width: 1399px) {
+    .content {
+        padding: 20px;
+        width: fit-content;
+        max-width: min(60%, 900px);
+        margin: 0 auto;
+    }
+    
+    /* Wider for pages with tables */
+    body:has(table) .content {
+        max-width: 1000px;
+    }
+}
+
+@media (min-width: 481px) and (max-width: 767px) {
     .content {
         padding: 15px;
-        width: 33%; /* Set table width to one-third of the screen */
-        margin: 0 auto; /* Center table horizontally */
+        width: fit-content;
+        max-width: 90%;
+        margin: 0 auto;
     }
 }
 
