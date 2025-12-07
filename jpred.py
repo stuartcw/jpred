@@ -1,4 +1,11 @@
-#!/usr/bin/env python3
+#!/usr/bin/env -S uv run --script
+# /// script
+# requires-python = ">=3.11"
+# dependencies = [
+#     "click",
+#     "jinja2",
+# ]
+# ///
 import click
 import sqlite3
 from jinja2 import Environment, FileSystemLoader
