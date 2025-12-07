@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="style.css?v=2">
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    <link rel="manifest" href="/site.webmanifest">
+</head>
+<html>
+<head>
+    <title>All Entrants</title>
+</head>
+<body>
+    <div class="content">
+    <h1><a href="/">JPred {{year}}</a></h1>
+    <h2>All Entrants</h2>
+    <p>By order of points, exact matches, J1, J2, J3<p>
+    <table>
+        <thead>
+            <tr>
+              <th class="center">Rank</th>
+              <th class="left">Name</th>
+              <th class="center">Points</th>
+              <th class="center">Exact</br>Matches</th>
+              <th class="center">J1</th>
+              <th class="center">J2</th>
+              <th class="center">J3</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for entry in ordered_leaderboard %}
+        <tr>
+            <td class="center" data-label="Rank">{{ loop.index }}</td>
+            <td class="left" data-label="Name"><a href="preds/{{ entry[1] }}.html">{{ entry[1] }}</a></td>
+            <td class="center" data-label="Points">{{ entry[0] }}</td>
+            <td class="center" data-label="Exact">{{ entry[2]["total_exact_matches"] }}</td>
+            <td class="center" data-label="J1">{{ entry[2]["j1"] }}</td>
+            <td class="center" data-label="J2">{{ entry[2]["j2"] }}</td>
+            <td class="center" data-label="J3">{{ entry[2]["j3"] }}</td>
+        </tr>
+        {% endfor %}
+        <tbody>
+    </table>
+</body>
+</html>
