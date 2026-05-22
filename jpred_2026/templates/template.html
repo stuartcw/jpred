@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JPred {{year}}</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    <link rel="manifest" href="/site.webmanifest">
+</head>
+<html>
+<head>
+    <title>JPred {{year}}</title>
+</head>
+<body>
+    <div class="content">
+    <h1><a href="/">JPred {{year}}</a></h1>
+    <h2>All Entrants</h2>
+    <a href="users.html">Individual Entrants</a>
+    {% for column, results in data.items() %}
+    <h2>Predictions for {{ column }}</h2>
+    <table border="1">
+        <tr>
+            <th>Team</th>
+            <th># of Predictions</th>
+        </tr>
+        {% for value, count in results %}
+        <tr>
+            <td data-label="Team">{{ value }}</td>
+            <td data-label="# of Predictions">{{ count }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+    {% endfor %}
+    </div>
+</body>
+</html>

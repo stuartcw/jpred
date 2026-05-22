@@ -1,0 +1,5 @@
+junk/
+__pycache__/
+deploy.sh
+docs/
+team_mapping_verification.md

@@ -1,4 +1,3 @@
-source bin/activate
 mkdir -p docs
 mkdir -p docs/preds
 rm jpred.db
@@ -13,3 +12,5 @@ rm -r docs/preds/*.html
 cp assets/favicons/*.png docs
 cp assets/favicons/*.ico docs
 cp assets/favicons/site.webmanifest docs
+cp index.html docs
+cp style.css docs

@@ -10,3 +10,6 @@ jpred.db
 */.DS_Store
 *.log
 _site
+*.db
+*.csv
+.doing.md
