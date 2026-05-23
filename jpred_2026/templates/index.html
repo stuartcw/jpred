@@ -20,6 +20,7 @@
         <main class="leaderboard-main">
             <h2>Leaderboard</h2>
             <p>By order of points, J1 exact matches, J2/3 exact matches, total exact matches.</p>
+            <div class="table-wrap">
             <table>
                 <thead>
                     <tr>
@@ -44,6 +45,7 @@
                 {% endfor %}
                 </tbody>
             </table>
+            </div>
             <p class="rendered-at">Generated: {{ rendered_at }}</p>
         </main>
 

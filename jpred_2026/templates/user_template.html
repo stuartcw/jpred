@@ -3,41 +3,42 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-    <link rel="stylesheet" href="../style.css">
+    <title>{{ name }}'s Predictions - JPred {{year}}</title>
+    <link rel="stylesheet" href="../style.css?v=4">
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
     <link rel="manifest" href="/site.webmanifest">
 </head>
-<html>
-<head>
-    <title>{{ name }}'s Predictions</title>
-</head>
 <body>
-    
     <div class="content">
     <h1><a href="/">JPred {{year}}</a></h1>
     <h2>{{ name }}'s Predictions</h2>
     <h3>Total {{ total_score }}</h3>
     {% for league in predictions.keys() %}
     <h2>{{ group_labels.get(league, league) }}</h2>
-    <table border="1">
+    <div class="table-wrap">
+    <table>
+        <thead>
         <tr>
             <th>Prediction</th>
             <th>Team</th>
             <th>Actual Position</th>
             <th>Points</th>
         </tr>
-        {% for prediction in predictions[league]%}
+        </thead>
+        <tbody>
+        {% for prediction in predictions[league] %}
         <tr>
-            <td data-label="Prediction"><b>{{ prediction["Prediction"] }}</b></td></td>
+            <td data-label="Prediction"><b>{{ prediction["Prediction"] }}</b></td>
             <td data-label="Team"><a href="../teams.html#{{ prediction['Team'] | team_id }}">{{ prediction["Team"] }}</a></td>
-            <td data-label="Actual">{{ prediction["Position"] }}</td>
+            <td data-label="Actual Position">{{ prediction["Position"] }}</td>
             <td data-label="Points">{{ prediction["Score"] }}</td>
         </tr>
         {% endfor %}
+        </tbody>
     </table>
+    </div>
     {% endfor %}
 
     <p class="rendered-at">Generated {{ rendered_at }}</p>
