@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JPred {{year}}</title>
+    <link rel="stylesheet" href="style.css?v=4">
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    <link rel="manifest" href="/site.webmanifest">
+</head>
+<body>
+    <div class="content">
+    <h1>JPred {{year}}</h1>
+    <p>Predict the top and bottom clubs in the J.League's 100-Year Vision regional competition.</p>
+
+    <div class="page-layout">
+
+        <main class="leaderboard-main">
+            <h2>Leaderboard</h2>
+            <p>By order of points, J1 exact matches, J2/3 exact matches, total exact matches.</p>
+            <table>
+                <thead>
+                    <tr>
+                        <th class="center">Rank</th>
+                        <th class="left">Name</th>
+                        <th class="center">Points</th>
+                        <th class="center">Exact<br>Matches<br>J1</th>
+                        <th class="center">Exact<br>Matches<br>J2/3</th>
+                        <th class="center">Total<br>Exact<br>Matches</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for entry in ordered_leaderboard %}
+                <tr>
+                    <td class="center" data-label="Rank">{{ loop.index }}</td>
+                    <td class="left" data-label="Name"><a href="preds/{{ entry[1] }}.html">{{ entry[1] }}</a></td>
+                    <td class="center" data-label="Points">{{ entry[0] }}</td>
+                    <td class="center" data-label="J1 Exact">{{ entry[2]["j1_exact"] if entry[2] else "-" }}</td>
+                    <td class="center" data-label="J2/3 Exact">{{ entry[2]["j2j3_exact"] if entry[2] else "-" }}</td>
+                    <td class="center" data-label="Total Exact">{{ entry[2]["total_exact"] if entry[2] else "-" }}</td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+            <p class="rendered-at">Generated: {{ rendered_at }}</p>
+        </main>
+
+        <aside class="sidebar">
+
+            <h2>Reports</h2>
+
+            <div class="sidebar-item">
+                <a href="teams.html">Teams A-Z</a>
+                <p>Browse every team alphabetically to see which participants predicted them and for which position.</p>
+            </div>
+
+            <h2>J1 League</h2>
+
+            <div class="sidebar-item">
+                <a href="j1_winner.html">J1 Overall Winner</a>
+                <p>Aggregate predictions for which team will win the J1 playoff.</p>
+            </div>
+            <div class="sidebar-item">
+                <a href="j1_east.html">J1 East Group</a>
+                <p>Aggregate predictions for the top 3 and bottom 3 teams in the J1 East conference.</p>
+            </div>
+            <div class="sidebar-item">
+                <a href="j1_west.html">J1 West Group</a>
+                <p>Aggregate predictions for the top 3 and bottom 3 teams in the J1 West conference.</p>
+            </div>
+
+            <h2>J2/J3 League</h2>
+
+            <div class="sidebar-item">
+                <a href="j2_3_winner.html">J2/J3 Overall Winner</a>
+                <p>Aggregate predictions for which team will win the J2/J3 playoff.</p>
+            </div>
+            <div class="sidebar-item">
+                <a href="j2_3_east_a.html">J2/J3 East-A Group</a>
+                <p>Aggregate predictions for 1st and last place in J2/J3 East-A conference.</p>
+            </div>
+            <div class="sidebar-item">
+                <a href="j2_3_east_b.html">J2/J3 East-B Group</a>
+                <p>Aggregate predictions for 1st and last place in J2/J3 East-B conference.</p>
+            </div>
+            <div class="sidebar-item">
+                <a href="j2_3_west_a.html">J2/J3 West-A Group</a>
+                <p>Aggregate predictions for 1st and last place in J2/J3 West-A conference.</p>
+            </div>
+            <div class="sidebar-item">
+                <a href="j2_3_west_b.html">J2/J3 West-B Group</a>
+                <p>Aggregate predictions for 1st and last place in J2/J3 West-B conference.</p>
+            </div>
+
+        </aside>
+
+    </div>
+    </div>
+</body>
+</html>

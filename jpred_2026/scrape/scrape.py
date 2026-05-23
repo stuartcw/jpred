@@ -4,186 +4,194 @@
 # dependencies = [
 #     "requests",
 #     "beautifulsoup4",
-#     "pandas",
 #     "click",
-#     "icecream",
 # ]
 # ///
+"""
+Scrape J.League standings for the 2026 100-Year Vision regional competition.
 
+The 2026 season uses a regional conference format. Two source pages each contain
+multiple groups, identified by <h4 class="leftRedTit"> section headers.
+
+Source pages:
+  https://www.jleague.jp/standings/j1/    -> EAST, WEST
+  https://www.jleague.jp/standings/j2j3/  -> EAST-Aグループ, EAST-Bグループ,
+                                             WEST-Aグループ, WEST-Bグループ
+
+Usage:
+  ./scrape.py --league j1_east
+  ./scrape.py --league j1_west
+  ./scrape.py --league j2_3_east_a
+  ./update_tables.sh   # scrape all six groups
+"""
 
 import requests
 from bs4 import BeautifulSoup
-import pandas as pd
 from datetime import datetime
 import os
 import json
-from icecream import ic
 import click
+
+current_year = datetime.now().year
+
+# Maps CLI league name -> (cache_key, source_url, section_header_substring)
+LEAGUE_CONFIG = {
+    "j1_east":     ("j1",   "https://www.jleague.jp/standings/j1/",    "EAST"),
+    "j1_west":     ("j1",   "https://www.jleague.jp/standings/j1/",    "WEST"),
+    "j2_3_east_a": ("j2j3", "https://www.jleague.jp/standings/j2j3/",  "EAST-A"),
+    "j2_3_east_b": ("j2j3", "https://www.jleague.jp/standings/j2j3/",  "EAST-B"),
+    "j2_3_west_a": ("j2j3", "https://www.jleague.jp/standings/j2j3/",  "WEST-A"),
+    "j2_3_west_b": ("j2j3", "https://www.jleague.jp/standings/j2j3/",  "WEST-B"),
+}
+
+FORM_MAP = {"01": "W", "02": "D", "03": "L"}
 
 
 def safe_int(value):
-    """Convert value to an integer, returning 0 if conversion fails."""
     try:
         return int(value)
     except (ValueError, TypeError):
         return 0
 
 
-current_year = datetime.now().year
-
-
-def download_table(data_url, download_dir, league, year=current_year):
-
-    ic(data_url)
-    html_filename = f"{download_dir}/{league}_{year}.html"
-    meta_filename = f"{download_dir}/{league}_{year}_meta.json"
+def fetch_page(url, cache_key, download_dir, year):
+    """Download a page (or return cached HTML if fresh enough)."""
+    html_file = os.path.join(download_dir, f"{cache_key}_{year}.html")
+    meta_file = os.path.join(download_dir, f"{cache_key}_{year}_meta.json")
 
     use_cache = False
-    html_content = None
 
-    # Check if both cache files exist
-    if os.path.exists(html_filename) and os.path.exists(meta_filename):
+    if os.path.exists(html_file) and os.path.exists(meta_file):
         try:
-            with open(meta_filename, "r") as f:
+            with open(meta_file) as f:
                 meta = json.load(f)
-                cached_last_modified = meta.get("last_modified")
-                cached_time = datetime.fromisoformat(meta["timestamp"])
-                current_time = datetime.now()
-
-                ic("Check if cache is still valid (less than a day old)")
-                if (current_time - cached_time).total_seconds() < 86400:
-                    use_cache = True
-                    ic("Use cache.")
-                else:
-                    ic("Cache is stale; check server for Last-Modified")
-                    try:
-                        ic("Try HEAD request first")
-                        headers_response = requests.head(data_url)
-                        if headers_response.status_code != 200:
-                            ic(
-                                "Can't retrieve HEAD -  Fallback to GET without downloading body"
-                            )
-                            headers_response = requests.get(data_url, stream=True)
-                            headers_response.close()
-                        last_modified = headers_response.headers.get("Last-Modified")
-                    except requests.exceptions.RequestException as e:
-                        print(f"Error checking server headers: {e}")
-                        ic("Use stale cache as fallback")
+            cached_time = datetime.fromisoformat(meta["timestamp"])
+            if (datetime.now() - cached_time).total_seconds() < 86400:
+                use_cache = True
+            else:
+                try:
+                    resp = requests.head(url)
+                    last_modified = resp.headers.get("Last-Modified")
+                    if last_modified and last_modified == meta.get("last_modified"):
+                        meta["timestamp"] = datetime.now().isoformat()
+                        with open(meta_file, "w") as f:
+                            json.dump(meta, f)
                         use_cache = True
-                    else:
-                        if last_modified and last_modified == cached_last_modified:
-                            ic("Server content hasn't changed; renew cache timestamp")
-                            meta["timestamp"] = datetime.now().isoformat()
-                            with open(meta_filename, "w") as f:
-                                json.dump(meta, f)
-                            use_cache = True
-                        else:
-                            ic(
-                                "Server content has changed or Last-Modified not present - downloading fresh"
-                            )
-                            use_cache = False
-        except (json.JSONDecodeError, KeyError) as e:
-            print(f"Error reading metadata file: {e}. Proceeding to download.")
+                except requests.exceptions.RequestException as e:
+                    print(f"Warning: could not check server headers ({e}), using cache.")
+                    use_cache = True
+        except (json.JSONDecodeError, KeyError):
             use_cache = False
 
     if use_cache:
-        ic("Read from cache")
-        with open(html_filename, "r", encoding="utf-8") as f:
-            html_content = f.read()
-    else:
-        ic("Download new content.")
-        response = requests.get(data_url)
-        if response.status_code != 200:
-            print(f"Failed to retrieve the page. Status code: {response.status_code}")
-            return None
-        html_content = response.text
-        # Save HTML to cache
-        with open(html_filename, "w", encoding="utf-8") as f:
-            f.write(html_content)
-        # Save metadata
-        last_modified = response.headers.get("Last-Modified")
-        meta = {"last_modified": last_modified, "timestamp": datetime.now().isoformat()}
-        ic(meta["last_modified"])
-        ic(meta["timestamp"])
-        with open(meta_filename, "w") as f:
-            json.dump(meta, f)
+        print(f"Using cached {html_file}")
+        with open(html_file, encoding="utf-8") as f:
+            return f.read()
 
-    # Parse HTML content
-    soup = BeautifulSoup(html_content, "html.parser")
-    table = soup.find("table", class_="standing-table")
+    print(f"Downloading {url}")
+    resp = requests.get(url)
+    if resp.status_code != 200:
+        print(f"Error: HTTP {resp.status_code} for {url}")
+        return None
+    html = resp.text
+    with open(html_file, "w", encoding="utf-8") as f:
+        f.write(html)
+    meta = {"last_modified": resp.headers.get("Last-Modified"), "timestamp": datetime.now().isoformat()}
+    with open(meta_file, "w") as f:
+        json.dump(meta, f)
+    return html
 
-    if not table:
-        print("No standings table found.")
+
+def parse_form(td):
+    """Extract form string (e.g. 'WDLWW') from the last-5-matches cell."""
+    result = []
+    for img in td.find_all("img"):
+        src = img.get("src", "")
+        # src looks like /img/common/ico_match01.png
+        key = src.rsplit("ico_match", 1)[-1].replace(".png", "")
+        result.append(FORM_MAP.get(key, "?"))
+    return "".join(result)
+
+
+def parse_section(html, section_id):
+    """Find the standings table for the named section and return a list of team dicts."""
+    soup = BeautifulSoup(html, "html.parser")
+
+    target_h4 = None
+    for h4 in soup.find_all("h4", class_="leftRedTit"):
+        if section_id in h4.get_text():
+            target_h4 = h4
+            break
+
+    if not target_h4:
+        print(f"Error: section '{section_id}' not found. Available h4 headers:")
+        for h4 in soup.find_all("h4", class_="leftRedTit"):
+            print(f"  {h4.get_text().strip()}")
         return None
 
-    # Process the table rows
-    league_table = []
-    for row in table.find("tbody").find_all("tr"):
-        cols = row.find_all("td")
-        team_data = {
-            "Position": safe_int(cols[0].text.strip()),
-            "Club": cols[1].text.strip(),
-            "Played": safe_int(cols[2].text.strip()),
-            "Won": safe_int(cols[3].text.strip()),
-            "Drawn": safe_int(cols[4].text.strip()),
-            "Lost": safe_int(cols[5].text.strip()),
-            "Goals For": safe_int(cols[6].text.strip()),
-            "Goals Against": safe_int(cols[7].text.strip()),
-            "Goal Difference": safe_int(cols[8].text.strip()),
-            "Points": safe_int(cols[9].text.strip()),
-            "Form": "".join(item.text.strip() for item in cols[10].find_all("div")),
-        }
-        league_table.append(team_data)
+    table = target_h4.find_next("table", class_="scoreTable01")
+    if not table:
+        print(f"Error: no table found after section header '{section_id}'")
+        return None
 
-    return league_table
+    rows = []
+    for tr in table.find("tbody").find_all("tr"):
+        cols = tr.find_all("td")
+        if len(cols) < 12:
+            continue
+        # col[0] = icon, col[1] = position, col[2] = club, col[3] = points,
+        # col[4] = played, col[5] = won, col[6] = PK won, col[7] = PK lost,
+        # col[8] = lost, col[9] = GF, col[10] = GA, col[11] = GD, col[12] = form
+        span = cols[2].find("span", class_="embS")
+        club = span.get_text().strip() if span else cols[2].get_text().strip()
+        rows.append({
+            "Position":        safe_int(cols[1].get_text().strip()),
+            "Club":            club,
+            "Points":          safe_int(cols[3].get_text().strip()),
+            "Played":          safe_int(cols[4].get_text().strip()),
+            "Won":             safe_int(cols[5].get_text().strip()),
+            "PK Won":          safe_int(cols[6].get_text().strip()),
+            "PK Lost":         safe_int(cols[7].get_text().strip()),
+            "Lost":            safe_int(cols[8].get_text().strip()),
+            "Goals For":       safe_int(cols[9].get_text().strip()),
+            "Goals Against":   safe_int(cols[10].get_text().strip()),
+            "Goal Difference": safe_int(cols[11].get_text().strip()),
+            "Form":            parse_form(cols[12]) if len(cols) > 12 else "",
+        })
+    return rows
 
 
 @click.command()
 @click.option(
-    "--league", "-l", default="j1", help="League to scrape (e.g., j1, j2, j3)"
+    "--league", "-l", default="j1_east",
+    type=click.Choice(list(LEAGUE_CONFIG.keys())),
+    help="League group to scrape",
 )
-@click.option("--year", "-y", default=current_year, help="Year to scrape data from")
-@click.option(
-    "--download_dir_base",
-    "-b",
-    default="downloads",
-    help="Base directory for downloaded html files",
-)
-@click.option(
-    "--output_dir_base", "-b", default="tables", help="Base directory for output files"
-)
-@click.option(
-    "--data_url_base", "-d", default="https://www.jleague.co/standings", help=""
-)
-def main(league, year, output_dir_base, data_url_base, download_dir_base):
-    """Scrape J.League standings data."""
-    # Create base directory if it doesn't exist
+@click.option("--year", "-y", default=current_year, help="Season year (used for cache and output paths)")
+@click.option("--download_dir", default="downloads", help="Directory for cached HTML files")
+@click.option("--output_dir", default="tables", help="Base directory for JSON output")
+def main(league, year, download_dir, output_dir):
+    """Scrape J.League standings for one regional group and write JSON output."""
+    cache_key, url, section_id = LEAGUE_CONFIG[league]
 
-    data_url = f"{data_url_base}/{league}/{year}/"
+    os.makedirs(download_dir, exist_ok=True)
+    out_path = os.path.join(output_dir, str(year))
+    os.makedirs(out_path, exist_ok=True)
 
-    download_dir = os.path.join(download_dir_base, f"{year}/{league}")
-    if not os.path.exists(download_dir):
-        os.makedirs(download_dir, exist_ok=True)
+    html = fetch_page(url, cache_key, download_dir, year)
+    if html is None:
+        raise SystemExit(1)
 
-    output_dir = os.path.join(output_dir_base, f"{year}")
-    if not os.path.exists(output_dir):
-        os.makedirs(output_dir, exist_ok=True)
+    table = parse_section(html, section_id)
+    if table is None:
+        raise SystemExit(1)
 
-    # Set global output directory for downloads
-    # global html_filename
-    # html_filename = os.path.join(download_dir, f"{league}_{year}.html")
-
-    league_table = download_table(data_url, download_dir, league, year)
-
-    if league_table is not None:
-        output_file_path = os.path.join(output_dir, f"{league}.json")
-        ic(output_file_path)
-        with open(output_file_path, "w") as f:
-            json.dump(league_table, f, indent=2)
-        for row in league_table:
-            print(row)
-    else:
-        print("Failed to retrieve league table.")
+    json_file = os.path.join(out_path, f"{league}.json")
+    with open(json_file, "w") as f:
+        json.dump(table, f, indent=2, ensure_ascii=False)
+    print(f"Written {len(table)} teams to {json_file}")
+    for row in table:
+        print(f"  {row['Position']:2}. {row['Club']} ({row['Points']} pts)")
 
 
 if __name__ == "__main__":

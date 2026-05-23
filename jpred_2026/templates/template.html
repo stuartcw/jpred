@@ -28,7 +28,7 @@
         </tr>
         {% for value, count in results %}
         <tr>
-            <td data-label="Team">{{ value }}</td>
+            <td data-label="Team"><a href="teams.html#{{ value | team_id }}">{{ value }}</a></td>
             <td data-label="# of Predictions">{{ count }}</td>
         </tr>
         {% endfor %}

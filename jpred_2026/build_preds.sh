@@ -53,8 +53,20 @@ else
 fi
 
 echo ""
-echo "Step 3: Generate per-user prediction pages..."
-./jpred_users.py --year "$YEAR"
+echo "Step 3: Generate aggregate prediction summary pages..."
+for GROUP in j1_winner j1_east j1_west j2_3_winner j2_3_east_a j2_3_east_b j2_3_west_a j2_3_west_b; do
+    ./jpred.py --year "$YEAR" "docs/${GROUP}.html" "cols/${GROUP}.cols"
+done
 
 echo ""
-echo "Done. Pages written to docs/preds/ and docs/users.html"
+echo "Step 4: Generate team A-Z report..."
+./jpred_teams.py --year "$YEAR"
+
+echo ""
+echo "Step 5: Generate per-user prediction pages..."
+./jpred_users.py --year "$YEAR"
+
+cp style.css docs/style.css
+
+echo ""
+echo "Done. Pages written to docs/ and docs/preds/"

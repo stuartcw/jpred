@@ -3,30 +3,24 @@
 # requires-python = ">=3.11"
 # dependencies = [
 #     "click",
-#     "icecream",
 #     "jinja2",
 # ]
 # ///
 """
-Generate individual user prediction pages and users index for JPred.
+Generate individual user prediction pages and users index for JPred 2026.
 
-This module creates HTML pages for each participant showing their predictions across
-all leagues, along with calculated scores based on actual results from
-league table JSON files. It also generates a users index page listing all participants.
+Scoring (per prediction):
+  - 2 points for exact position match
+  - 1 point for being in the correct zone (top 3 or bottom 3 of each group)
+  Maximum 3 points per prediction.
 
-The scoring system awards points based on prediction accuracy:
-- J1: 2 points for exact position match (top 3 or bottom 3), 1 point for correct group
-- J2/J3: 2 points for exact position match (top 6 or bottom 3), 1 point for correct group
-
-Leaderboard is sorted by: total points, then exact matches, then J1 score, J2 score, J3 score.
-Results are saved to a 'results' table in the database with rankings.
+Winner predictions (j1_winner, j2_3_winner) are playoff-determined and
+shown without scoring until the playoff results are available.
 
 Usage:
-    jpred_users.py
-
-The script auto-detects the year from the tables/ directory structure and generates
-pages in the docs/preds/ directory.
+    jpred_users.py [--year YEAR]
 """
+import re
 import click
 import sys
 import sqlite3
@@ -35,7 +29,11 @@ from jinja2 import Environment, FileSystemLoader
 from pathlib import Path
 
 
-# Function to connect to the SQLite database
+def team_id(name):
+    """Convert a team name to a URL-safe anchor ID."""
+    return re.sub(r'[^a-z0-9]+', '-', name.lower()).strip('-')
+
+
 def create_connection(db_file):
     conn = None
     try:
@@ -48,12 +46,13 @@ def create_connection(db_file):
 
 def get_all_users(conn):
     cursor = conn.cursor()
-    cursor.execute(f'''SELECT Name FROM jpred''')
-    # return as a list strings
+    cursor.execute("SELECT Name FROM jpred")
     return [row["Name"] for row in cursor.fetchall()]
+
 
 def _load_cols(path):
     return [line.strip() for line in Path(path).read_text().splitlines() if line.strip()]
+
 
 def _load_labels(path):
     labels = {}
@@ -63,8 +62,9 @@ def _load_labels(path):
             labels[col.strip()] = label.strip()
     return labels
 
+
 column_labels = _load_labels("labels/column_labels.tsv")
-group_labels = _load_labels("labels/group_labels.tsv")
+group_labels  = _load_labels("labels/group_labels.tsv")
 
 league_predictions = {
     "j1_winner":   _load_cols("cols/j1_winner.cols"),
@@ -77,73 +77,74 @@ league_predictions = {
     "j2_3_west_b": _load_cols("cols/j2_3_west_b.cols"),
 }
 
-def j1_score(index):
-    if index < 4:
-        return f"""CASE
-          WHEN position = {index} THEN 1 ELSE 0 END
-          + CASE WHEN position IN (1, 2, 3) THEN 1 ELSE 0
-            END"""
-    else:
-        return f"""CASE
-          WHEN position = {index+11} THEN 1 ELSE 0 END
-          + CASE WHEN position IN (8, 9, 10 ) THEN 1 ELSE 0
-            END"""
-
-def j2_j3_score(index):
-    if index < 7:
-        return f"""CASE
-          WHEN position = {index} THEN 1 ELSE 0 END
-          + CASE WHEN position IN (1, 2, 3, 4, 5, 6) THEN 1 ELSE 0
-            END"""
-    else:
-        return f"""CASE
-          WHEN position = {index+11} THEN 1 ELSE 0 END
-          + CASE WHEN position IN (8, 9, 10 ) THEN 1 ELSE 0
-            END"""
-
-
-score_criteria={ 
-                "j1": j1_score,
-                "j2": j2_j3_score
-        }
-
-
-def make_league_score_SQL(name,league,year):
-    table=f"{league}_{year}"
-    sql_unions=[]
-
-    for index, prediction_name in enumerate(league_predictions[league],start=1):
-        #nic(index, prediction_name)
-
-        ONE_PREDICTION_SQL=f"""
-        SELECT {index} as "Index", Position, Prediction, Team, Position, 
-            {score_criteria[league](index)} Score FROM
-            (
-            SELECT *, (SELECT Position FROM {table} WHERE {table}.Team = prediction.Team) AS Position 
-            FROM (SELECT
-                    Name,
-                    {index} AS "Order",
-                    '{prediction_name.title()}' as Prediction ,
-                    [{prediction_name}] AS Team
-                FROM jpred
-                WHERE Name = '{name}'
-            ) as prediction )"""
-
-        sql_unions.append(ONE_PREDICTION_SQL)
+# Scoring config per group:
+#   table    - DB table key (combined with year: "{table}_{year}")
+#   positions - expected position for each prediction in the group
+#   zones     - (low, high) bonus zone for each prediction
+#               a point is awarded if the actual position falls in this range
+GROUP_SCORING = {
+    "j1_east": {
+        "table":     "j1_east",
+        "positions": [1, 2, 3, 8, 9, 10],
+        "zones":     [(1, 3), (1, 3), (1, 3), (8, 10), (8, 10), (8, 10)],
+    },
+    "j1_west": {
+        "table":     "j1_west",
+        "positions": [1, 2, 3, 8, 9, 10],
+        "zones":     [(1, 3), (1, 3), (1, 3), (8, 10), (8, 10), (8, 10)],
+    },
+    "j2_3_east_a": {
+        "table":     "j2_3_east_a",
+        "positions": [1, 10],
+        "zones":     [(1, 3), (8, 10)],
+    },
+    "j2_3_east_b": {
+        "table":     "j2_3_east_b",
+        "positions": [1, 10],
+        "zones":     [(1, 3), (8, 10)],
+    },
+    "j2_3_west_a": {
+        "table":     "j2_3_west_a",
+        "positions": [1, 10],
+        "zones":     [(1, 3), (8, 10)],
+    },
+    "j2_3_west_b": {
+        "table":     "j2_3_west_b",
+        "positions": [1, 10],
+        "zones":     [(1, 3), (8, 10)],
+    },
+    # winner predictions are playoff-determined: no table to look up yet
+    "j1_winner":   None,
+    "j2_3_winner": None,
+}
 
 
-    #ic(sql_unions)
-    return " UNION ".join(sql_unions)
+def get_team_position(conn, table_name, team_name):
+    """Return a team's position from the league table, or None if not found."""
+    try:
+        cursor = conn.cursor()
+        cursor.execute(f'SELECT Position FROM "{table_name}" WHERE Team = ?', (team_name,))
+        row = cursor.fetchone()
+        return row[0] if row else None
+    except sqlite3.OperationalError:
+        return None
 
-def query_database(conn, sql):
-    cursor = conn.cursor()
-    cursor.execute(sql)
-    return cursor
 
+def score_prediction(actual_pos, expected_pos, zone):
+    """Return points for one prediction: 2 for exact match + 1 for correct zone.
+
+    Only call when actual_pos is not None.
+    """
+    low, high = zone
+    points = 0
+    if actual_pos == expected_pos:
+        points += 2
+    if low <= actual_pos <= high:
+        points += 1
+    return points
 
 
 def write_one_user(conn, name, html_filename, env, year="2026"):
-    env = Environment(loader=FileSystemLoader('.'))
     template = env.get_template('templates/user_template.html')
 
     cursor = conn.cursor()
@@ -154,22 +155,79 @@ def write_one_user(conn, name, html_filename, env, year="2026"):
         return
 
     predictions = {}
+    total_score = 0
+    j1_exact = 0
+    j2j3_exact = 0
+    j1_score = 0
+    j2j3_score = 0
+    has_any_score = False
+
+    J1_GROUPS    = {"j1_east", "j1_west"}
+    J2J3_GROUPS  = {"j2_3_east_a", "j2_3_east_b", "j2_3_west_a", "j2_3_west_b"}
+
     for group, cols in league_predictions.items():
         if not cols:
             continue
-        predictions[group] = [
-            {"Prediction": column_labels.get(col, col), "Team": row[col] if col in row.keys() else "", "Position": "-", "Score": "-"}
-            for col in cols
-        ]
+
+        scoring = GROUP_SCORING.get(group)
+        group_preds = []
+
+        for i, col in enumerate(cols):
+            team = row[col] if col in row.keys() else ""
+            position = "-"
+            score = "-"
+
+            if scoring and team:
+                table_name = f"{scoring['table']}_{year}"
+                actual_pos = get_team_position(conn, table_name, team)
+                if actual_pos is not None:
+                    position = actual_pos
+                    pts = score_prediction(actual_pos, scoring["positions"][i], scoring["zones"][i])
+                    score = pts
+                    total_score += pts
+                    has_any_score = True
+                    if group in J1_GROUPS:
+                        j1_score += pts
+                        if pts >= 2:
+                            j1_exact += 1
+                    elif group in J2J3_GROUPS:
+                        j2j3_score += pts
+                        if pts >= 2:
+                            j2j3_exact += 1
+
+            group_preds.append({
+                "Prediction": column_labels.get(col, col),
+                "Team":       team,
+                "Position":   position,
+                "Score":      score,
+            })
+
+        predictions[group] = group_preds
 
     rendered_at = datetime.now().strftime("%Y-%m-%d %H:%M")
+    display_total = total_score if has_any_score else "-"
     with open(html_filename, "w") as html_file:
-        html_content = template.render(predictions=predictions, name=name, total_score="-", year=year, group_labels=group_labels, rendered_at=rendered_at)
+        html_content = template.render(
+            predictions=predictions,
+            name=name,
+            total_score=display_total,
+            year=year,
+            group_labels=group_labels,
+            rendered_at=rendered_at,
+        )
         html_file.write(html_content)
     print(f"Written {html_filename}")
+    if not has_any_score:
+        return None
+    return {
+        "total":       total_score,
+        "j1_exact":    j1_exact,
+        "j2j3_exact":  j2j3_exact,
+        "total_exact": j1_exact + j2j3_exact,
+        "j1":          j1_score,
+        "j2j3":        j2j3_score,
+    }
 
-def _main():
-    print(make_league_score_SQL("Stuart Woodward","j3","2024"))
 
 @click.command()
 @click.option('--year', default=None, help='Year to generate (e.g. 2026). Auto-detects from tables/ if omitted.')
@@ -189,27 +247,46 @@ def main(year):
         f.unlink()
     preds_dir.mkdir(parents=True, exist_ok=True)
     env = Environment(loader=FileSystemLoader('.'))
+    env.filters['team_id'] = team_id
 
     conn = create_connection(db_path)
     names = get_all_users(conn)
+
+    scores = {}
     for name in names:
         if '/' in name:
             print(f"Skipping {name} (contains /)")
             continue
         html_filename = f"docs/preds/{name}.html"
-        write_one_user(conn, name, html_filename, env, year)
+        score = write_one_user(conn, name, html_filename, env, year)
+        scores[name] = score
 
     conn.close()
 
-    ordered_leaderboard = [
-        ("-", name, {"total_exact_matches": "-", "j1": "-", "j2": "-", "j3": "-"})
-        for name in names if '/' not in name
-    ]
+    # Sort: total desc, total_exact desc, j1_exact desc
+    scored = sorted(
+        [(s, n) for n, s in scores.items() if s is not None],
+        key=lambda x: (-x[0]["total"], -x[0]["total_exact"], -x[0]["j1_exact"])
+    )
+    unscored = sorted(n for n, s in scores.items() if s is None)
+    ordered_leaderboard = (
+        [(s["total"], n, s) for s, n in scored] +
+        [("-", n, {}) for n in unscored]
+    )
+
+    rendered_at = datetime.now().strftime("%Y-%m-%d %H:%M")
+    leaderboard_data = dict(ordered_leaderboard=ordered_leaderboard, year=year, rendered_at=rendered_at)
+
     template = env.get_template('templates/users.html')
     with open('docs/users.html', 'w') as f:
-        f.write(template.render(ordered_leaderboard=ordered_leaderboard, year=year))
+        f.write(template.render(**leaderboard_data))
     print("Written docs/users.html")
 
-if __name__ == '__main__':
-    main()
+    template = env.get_template('templates/index.html')
+    with open('docs/index.html', 'w') as f:
+        f.write(template.render(**leaderboard_data))
+    print("Written docs/index.html")
 
+
+if __name__ == '__main__':
+    main()  # type: ignore[call-arg]

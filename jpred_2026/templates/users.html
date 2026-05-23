@@ -18,17 +18,16 @@
     <div class="content">
     <h1><a href="/">JPred {{year}}</a></h1>
     <h2>All Entrants</h2>
-    <p>By order of points, exact matches, J1, J2, J3<p>
+    <p>By order of points, J1 exact matches, J2/3 exact matches, J1 points<p>
     <table>
         <thead>
             <tr>
               <th class="center">Rank</th>
               <th class="left">Name</th>
               <th class="center">Points</th>
-              <th class="center">Exact</br>Matches</th>
-              <th class="center">J1</th>
-              <th class="center">J2</th>
-              <th class="center">J3</th>
+              <th class="center">Exact<br>Matches<br>J1</th>
+              <th class="center">Exact<br>Matches<br>J2/3</th>
+              <th class="center">Total<br>Exact<br>Matches</th>
             </tr>
         </thead>
         <tbody>
@@ -37,10 +36,9 @@
             <td class="center" data-label="Rank">{{ loop.index }}</td>
             <td class="left" data-label="Name"><a href="preds/{{ entry[1] }}.html">{{ entry[1] }}</a></td>
             <td class="center" data-label="Points">{{ entry[0] }}</td>
-            <td class="center" data-label="Exact">{{ entry[2]["total_exact_matches"] }}</td>
-            <td class="center" data-label="J1">{{ entry[2]["j1"] }}</td>
-            <td class="center" data-label="J2">{{ entry[2]["j2"] }}</td>
-            <td class="center" data-label="J3">{{ entry[2]["j3"] }}</td>
+            <td class="center" data-label="J1 Exact">{{ entry[2]["j1_exact"] if entry[2] else "-" }}</td>
+            <td class="center" data-label="J2/3 Exact">{{ entry[2]["j2j3_exact"] if entry[2] else "-" }}</td>
+            <td class="center" data-label="Total Exact">{{ entry[2]["total_exact"] if entry[2] else "-" }}</td>
         </tr>
         {% endfor %}
         <tbody>

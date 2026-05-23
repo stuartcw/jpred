@@ -17,9 +17,9 @@ rm -f docs/users.html
 rm -f docs/preds/*.html
 rm -f docs/leaderboard.png
 ./create_db.sh
-./jpred.py docs/j1.html cols/j1.cols
-./jpred.py docs/j2.html cols/j2.cols
-./jpred.py docs/j3.html cols/j3.cols
+for GROUP in j1_winner j1_east j1_west j2_3_winner j2_3_east_a j2_3_east_b j2_3_west_a j2_3_west_b; do
+    ./jpred.py "docs/${GROUP}.html" "cols/${GROUP}.cols"
+done
 ./jpred_users.py
 ./generate_leaderboard_image.py
 cp assets/favicons/*.png docs/ 2>/dev/null || true

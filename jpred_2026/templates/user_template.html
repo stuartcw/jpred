@@ -32,7 +32,7 @@
         {% for prediction in predictions[league]%}
         <tr>
             <td data-label="Prediction"><b>{{ prediction["Prediction"] }}</b></td></td>
-            <td data-label="Team">{{ prediction["Team"] }}</td>
+            <td data-label="Team"><a href="../teams.html#{{ prediction['Team'] | team_id }}">{{ prediction["Team"] }}</a></td>
             <td data-label="Actual">{{ prediction["Position"] }}</td>
             <td data-label="Points">{{ prediction["Score"] }}</td>
         </tr>

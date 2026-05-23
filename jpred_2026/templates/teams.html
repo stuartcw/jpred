@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JPred {{year}} - Teams</title>
+    <link rel="stylesheet" href="style.css?v=3">
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    <link rel="manifest" href="/site.webmanifest">
+</head>
+<body>
+    <div class="content">
+    <h1><a href="/">JPred {{year}}</a></h1>
+    <h2>Teams A-Z</h2>
+    <p>Each team listed with all participants who included them in a prediction.</p>
+
+    {% set current_letter = namespace(value='') %}
+    {% for team in teams %}
+        {% set first = team.name[0] | upper %}
+        {% if first != current_letter.value %}
+            {% set current_letter.value = first %}
+            <h3 class="alpha-header">{{ first }}</h3>
+        {% endif %}
+
+        <div class="team-entry" id="{{ team.name | team_id }}">
+            <h4 class="team-name">{{ team.name }}</h4>
+            {% if team.pickers %}
+                {% for label, names in team.pickers.items() %}
+                <h5 class="prediction-label">{{ label }}</h5>
+                <ul class="picker-list">
+                    {% for name in names %}
+                    <li><a href="preds/{{ name }}.html">{{ name }}</a></li>
+                    {% endfor %}
+                </ul>
+                {% endfor %}
+            {% else %}
+            <p class="no-picks">No predictions</p>
+            {% endif %}
+        </div>
+    {% endfor %}
+
+    <p class="rendered-at">Generated: {{ rendered_at }}</p>
+    </div>
+</body>
+</html>
