@@ -1,0 +1,296 @@
+/* Base styles */
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap');
+
+body {
+    font-family: 'Montserrat', sans-serif;
+    background-image: linear-gradient(0deg, green 25%, #006400 25%, #006400 50%, green 50%);
+    background-size: 100% 100px;
+    min-height: 100vh;
+    margin: 0;
+    padding: 20px;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700;
+}
+
+.content {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+
+a:link {
+    text-decoration: none;
+    color: #008000;
+}
+
+a:visited {
+    text-decoration: none;
+    color: #006400;
+}
+
+a:hover {
+    text-decoration: underline;
+    color: #004d00;
+}
+
+a:active {
+    text-decoration: none;
+    color: #003300;
+}
+
+table {
+    width: auto;
+    min-width: 100%;
+    border-collapse: collapse;
+    table-layout: auto;
+}
+
+table, th, td {
+    border: 2px solid #fff;
+}
+
+th, td {
+    text-align: left;
+    padding: 8px;
+}
+
+th {
+    background-color: #4CAF50;
+    color: white;
+}
+
+tr:nth-child(even) {
+    background-color: #f2f2f2;
+}
+
+tr:hover {
+    background-color: #ddd;
+}
+
+.center {
+    text-align: center;
+}
+.left {
+    text-align: left;
+}
+.right {
+    text-align: right;
+}
+
+/* Scroll container for wide tables on small screens */
+.table-wrap {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    margin-top: 20px;
+}
+
+.table-wrap table {
+    margin-top: 0;
+    min-width: 500px;
+}
+
+/* Desktop-specific styles */
+@media (min-width: 1400px) {
+    .content {
+        padding: 20px;
+        width: fit-content;
+        max-width: min(33%, 600px);
+        margin: 0 auto;
+    }
+
+    body:has(table) .content {
+        max-width: 1200px;
+    }
+}
+
+@media (min-width: 768px) and (max-width: 1399px) {
+    .content {
+        padding: 20px;
+        width: fit-content;
+        max-width: min(60%, 900px);
+        margin: 0 auto;
+    }
+
+    body:has(table) .content {
+        max-width: 1000px;
+    }
+}
+
+/* Tablet and below — reduce padding, keep tables scrollable */
+@media (max-width: 768px) {
+    body {
+        padding: 10px;
+    }
+
+    .content {
+        padding: 15px;
+    }
+
+    th, td {
+        padding: 6px;
+    }
+
+    a {
+        word-wrap: break-word;
+    }
+}
+
+/* Phone — card layout for tables */
+@media (max-width: 480px) {
+    body {
+        padding: 8px;
+    }
+
+    .content {
+        padding: 12px;
+        border-radius: 6px;
+    }
+
+    h1 { font-size: 1.5rem; }
+    h2 { font-size: 1.2rem; }
+    h3 { font-size: 1rem; }
+
+    /* Hide column headers — labels come from data-label on each cell */
+    thead { display: none; }
+
+    tbody tr {
+        display: block;
+        border: 1px solid #ddd;
+        border-radius: 6px;
+        margin-bottom: 12px;
+        padding: 4px 0;
+        background-color: #fff;
+    }
+
+    tbody tr:nth-child(even) {
+        background-color: #fff;
+    }
+
+    td {
+        display: flex;
+        align-items: baseline;
+        gap: 0.5em;
+        padding: 6px 10px;
+        border-bottom: 1px solid #eee;
+        font-size: 14px;
+        border-right: none;
+        border-left: none;
+        border-top: none;
+    }
+
+    td:last-child {
+        border-bottom: none;
+    }
+
+    td::before {
+        content: attr(data-label);
+        font-weight: 700;
+        flex-shrink: 0;
+        min-width: 7em;
+        color: #555;
+        font-size: 12px;
+    }
+
+    /* Disable scroll container on phones — card layout replaces it */
+    .table-wrap {
+        overflow-x: visible;
+    }
+
+    .table-wrap table {
+        min-width: 0;
+        width: 100%;
+    }
+}
+
+.rendered-at {
+    font-size: 11px;
+    color: #aaa;
+    margin-top: 2em;
+}
+
+/* Index page: leaderboard + sidebar layout */
+.page-layout {
+    display: flex;
+    gap: 30px;
+    align-items: flex-start;
+}
+
+.leaderboard-main {
+    flex: 1;
+    min-width: 0;
+}
+
+.sidebar {
+    width: 260px;
+    flex-shrink: 0;
+}
+
+.sidebar h2 {
+    font-size: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #4CAF50;
+    border-bottom: 2px solid #4CAF50;
+    padding-bottom: 4px;
+    margin-top: 1.5em;
+}
+
+.sidebar h2:first-child {
+    margin-top: 0;
+}
+
+.sidebar-item {
+    margin-bottom: 1em;
+}
+
+.sidebar-item a {
+    font-weight: 700;
+}
+
+.sidebar-item p {
+    font-size: 0.8em;
+    color: #666;
+    margin: 2px 0 0 0;
+    line-height: 1.4;
+}
+
+@media (max-width: 900px) {
+    .page-layout {
+        flex-direction: column;
+    }
+    .sidebar {
+        width: 100%;
+    }
+}
+
+/* Standings widget — compact league table, reusable on any page */
+.standings-widget {
+    margin: 10px 0 4px 0;
+}
+
+.standings-widget h3 {
+    font-size: 0.75em;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #999;
+    margin: 0 0 4px 0;
+}
+
+.standings-table {
+    width: 100%;
+    font-size: 0.78em;
+}
+
+.standings-table th,
+.standings-table td {
+    padding: 3px 6px;
+}
+
+.widget-empty {
+    font-size: 0.8em;
+    color: #999;
+}
