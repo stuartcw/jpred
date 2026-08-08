@@ -277,7 +277,13 @@ tr:hover {
     text-transform: uppercase;
     letter-spacing: 0.05em;
     color: #999;
-    margin: 0 0 4px 0;
+    margin: 0 0 2px 0;
+}
+
+.widget-scraped-at {
+    font-size: 0.62em;
+    color: #ccc;
+    margin: 0 0 6px 0;
 }
 
 .standings-table {
