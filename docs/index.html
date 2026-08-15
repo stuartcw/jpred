@@ -194,6 +194,56 @@
         .season-link:hover .arrow,
         .season-link:focus-visible .arrow { transform: translateX(4px); }
 
+        /* ---- Story ---- */
+        .story {
+            margin-top: 32px;
+            padding-top: 28px;
+            border-top: 1px solid var(--line);
+        }
+
+        .story h2 {
+            font-size: clamp(1.4rem, 5vw, 1.8rem);
+            font-weight: 800;
+            line-height: 1.15;
+            letter-spacing: -0.01em;
+            text-transform: none;
+            color: var(--green-darker);
+            margin: 0 0 18px;
+        }
+
+        .story p {
+            margin: 0 0 14px;
+            color: var(--ink);
+            font-size: 1rem;
+            line-height: 1.65;
+        }
+
+        .story p.aside {
+            color: var(--muted);
+            font-style: italic;
+        }
+
+        .story .pullquote {
+            font-weight: 700;
+            font-size: 1.08rem;
+            color: var(--green-dark);
+            border-left: 3px solid var(--green-accent);
+            padding-left: 14px;
+            margin: 0 0 14px;
+        }
+
+        .story .kicker {
+            font-weight: 700;
+            color: var(--green-darker);
+        }
+
+        .story .cta {
+            margin-top: 20px;
+            font-weight: 800;
+            font-size: 1.12rem;
+            color: var(--green-darker);
+        }
+
         /* ---- Footer ---- */
         .site-footer {
             margin-top: 28px;
@@ -270,6 +320,30 @@
                 </ul>
             </nav>
         </main>
+
+        <section class="story" aria-labelledby="story-heading">
+            <h2 id="story-heading">Think You Know the J.League? Prove It.</h2>
+
+            <p>JPRED began with a simple question among a group of J.League fans:</p>
+
+            <p class="pullquote">Who&rsquo;s going to finish where this season?</p>
+
+            <p>The rules were simple. Pick the top three and bottom three clubs in each league, post your predictions on Twitter with the #JPRED hashtag, then spend the rest of the season discovering just how wrong you were.</p>
+
+            <p>What started as a bit of friendly competition quickly took off. Predictions poured in from across the J.League community.</p>
+
+            <p class="kicker">Then came the difficult part.</p>
+
+            <p>At the end of the season, JPRED organiser Ritchie bravely disappeared into Twitter search, hunted down every entry, compiled them into one enormous spreadsheet, and calculated the results by hand.</p>
+
+            <p class="aside">Thankfully, those days are over.</p>
+
+            <p>JPRED is now fully automated. Make your predictions, follow the season, and watch the standings change as the results come in.</p>
+
+            <p>Think you can predict the J.League better than everyone else?</p>
+
+            <p class="cta">There&rsquo;s only one way to find out.</p>
+        </section>
 
         <footer class="site-footer">
             <p><a href="https://jpred.football/">jpred.football</a></p>
