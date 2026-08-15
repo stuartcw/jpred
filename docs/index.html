@@ -22,6 +22,8 @@
             --green-dark: #006400;
             --green-darker: #004d00;
             --green-accent: #4CAF50;
+            --turf: #2f7d38;
+            --turf-light: #379141;
             --ink: #1c2b1c;
             --muted: #5a6b5a;
             --card: #ffffff;
@@ -33,15 +35,24 @@
         body {
             font-family: 'Montserrat', sans-serif;
             color: var(--ink);
-            /* Football-pitch stripes, matching the original green scheme */
-            background-color: var(--green-dark);
-            background-image: repeating-linear-gradient(
-                0deg,
-                var(--green) 0,
-                var(--green) 50px,
-                var(--green-dark) 50px,
-                var(--green-dark) 100px
-            );
+            /* Mown football-pitch stripes: two close turf tones (so the
+               bands read as grass caught at different angles, not flat
+               blocks), warmed by a soft overhead light and grounded by a
+               gentle vignette for depth. */
+            background-color: var(--turf);
+            background-image:
+                radial-gradient(150% 100% at 50% -20%,
+                    rgba(255, 255, 255, 0.14),
+                    rgba(255, 255, 255, 0) 55%),
+                linear-gradient(180deg,
+                    rgba(0, 0, 0, 0) 60%,
+                    rgba(0, 0, 0, 0.22)),
+                repeating-linear-gradient(90deg,
+                    var(--turf) 0,
+                    var(--turf) 68px,
+                    var(--turf-light) 68px,
+                    var(--turf-light) 136px);
+            background-attachment: fixed;
             min-height: 100vh;
             margin: 0;
             padding: 24px 16px;
