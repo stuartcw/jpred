@@ -3,22 +3,277 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>JPred - J-League Predictions</title>
-    <link rel="stylesheet" href="style.css?v=3">
+    <title>JPred - J.League Predictions</title>
+    <meta name="description" content="JPred is a friendly prediction competition for the J.League: forecast the top and bottom clubs across the top three divisions each season.">
+    <meta name="theme-color" content="#006400">
+
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    <link rel="manifest" href="/site.webmanifest">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&display=swap">
+
+    <style>
+        :root {
+            --green: #008000;
+            --green-dark: #006400;
+            --green-darker: #004d00;
+            --green-accent: #4CAF50;
+            --ink: #1c2b1c;
+            --muted: #5a6b5a;
+            --card: #ffffff;
+            --line: #e4ece4;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            color: var(--ink);
+            /* Football-pitch stripes, matching the original green scheme */
+            background-color: var(--green-dark);
+            background-image: repeating-linear-gradient(
+                0deg,
+                var(--green) 0,
+                var(--green) 50px,
+                var(--green-dark) 50px,
+                var(--green-dark) 100px
+            );
+            min-height: 100vh;
+            margin: 0;
+            padding: 24px 16px;
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
+            -webkit-text-size-adjust: 100%;
+        }
+
+        .content {
+            background-color: var(--card);
+            width: 100%;
+            max-width: 620px;
+            margin: min(6vh, 48px) auto;
+            padding: 40px 32px;
+            border-radius: 16px;
+            box-shadow: 0 18px 45px rgba(0, 40, 0, 0.28);
+        }
+
+        /* ---- Header ---- */
+        .site-header {
+            text-align: center;
+            border-bottom: 1px solid var(--line);
+            padding-bottom: 24px;
+            margin-bottom: 24px;
+        }
+
+        .badge {
+            display: inline-block;
+            font-size: 0.72rem;
+            font-weight: 700;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            color: var(--green-dark);
+            background: #eaf5ea;
+            border-radius: 999px;
+            padding: 6px 14px;
+            margin-bottom: 16px;
+        }
+
+        h1 {
+            font-weight: 800;
+            font-size: clamp(2.4rem, 9vw, 3.4rem);
+            line-height: 1;
+            margin: 0 0 10px;
+            color: var(--green-darker);
+            letter-spacing: -0.01em;
+        }
+
+        .tagline {
+            font-weight: 600;
+            font-size: 1.05rem;
+            margin: 0 0 8px;
+            color: var(--green);
+        }
+
+        .intro {
+            margin: 0;
+            color: var(--muted);
+            font-size: 0.98rem;
+            line-height: 1.55;
+        }
+
+        /* ---- Seasons ---- */
+        h2 {
+            font-weight: 700;
+            font-size: 0.8rem;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--muted);
+            margin: 0 0 14px;
+        }
+
+        .seasons {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            display: grid;
+            gap: 12px;
+        }
+
+        .season-link {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            text-decoration: none;
+            color: var(--ink);
+            border: 1px solid var(--line);
+            border-radius: 12px;
+            padding: 16px 18px;
+            min-height: 64px;
+            transition: transform 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+        }
+
+        .season-link:hover,
+        .season-link:focus-visible {
+            border-color: var(--green-accent);
+            box-shadow: 0 6px 18px rgba(0, 100, 0, 0.14);
+            transform: translateY(-2px);
+            text-decoration: none;
+        }
+
+        .season-link:focus-visible {
+            outline: 3px solid var(--green-accent);
+            outline-offset: 2px;
+        }
+
+        .season-link.is-latest {
+            border-color: var(--green-accent);
+            background: linear-gradient(180deg, #f4fbf4, #ffffff);
+        }
+
+        .season-body { flex: 1 1 auto; min-width: 0; }
+
+        .season-name {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 700;
+            font-size: 1.12rem;
+            color: var(--green-darker);
+        }
+
+        .season-meta {
+            display: block;
+            font-size: 0.85rem;
+            color: var(--muted);
+            margin-top: 2px;
+        }
+
+        .tag {
+            font-size: 0.62rem;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: #fff;
+            background: var(--green-accent);
+            border-radius: 999px;
+            padding: 3px 9px;
+        }
+
+        .arrow {
+            flex: 0 0 auto;
+            color: var(--green-accent);
+            font-size: 1.4rem;
+            line-height: 1;
+            transition: transform 0.15s ease;
+        }
+
+        .season-link:hover .arrow,
+        .season-link:focus-visible .arrow { transform: translateX(4px); }
+
+        /* ---- Footer ---- */
+        .site-footer {
+            margin-top: 28px;
+            padding-top: 20px;
+            border-top: 1px solid var(--line);
+            text-align: center;
+            font-size: 0.85rem;
+            color: var(--muted);
+        }
+
+        .site-footer a { color: var(--green); text-decoration: none; font-weight: 600; }
+        .site-footer a:hover { text-decoration: underline; }
+
+        @media (max-width: 480px) {
+            .content { padding: 28px 20px; border-radius: 14px; }
+            .intro { font-size: 0.92rem; }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .season-link, .arrow { transition: none; }
+            .season-link:hover, .season-link:focus-visible { transform: none; }
+        }
+    </style>
 </head>
 <body>
     <div class="content">
-        <h1>JPred</h1>
-        <p>J-League Prediction Competition</p>
-        <p>Predict the top and bottom clubs in each division of the J.League's Top 3 divisions.</p>
-        
-        <h2>Select a Year</h2>
-        <ul>
-            <li><a href="2026-2027/">JPred 2026-2027</a></li>
-            <li><a href="2026/">JPred 2026</a></li>
-            <li><a href="2025/">JPred 2025</a></li>
-            <li><a href="2024/">JPred 2024</a></li>
-        </ul>
+        <header class="site-header">
+            <span class="badge">J.League Prediction Competition</span>
+            <h1>JPred</h1>
+            <p class="tagline">Predict the top &amp; bottom clubs, every season.</p>
+            <p class="intro">A friendly forecasting competition covering the top three divisions of the J.League &mdash; call the risers and the fallers, then track how your picks hold up on the leaderboard.</p>
+        </header>
+
+        <main>
+            <h2>Select a season</h2>
+            <nav aria-label="Seasons">
+                <ul class="seasons">
+                    <li>
+                        <a class="season-link is-latest" href="2026-2027/">
+                            <div class="season-body">
+                                <span class="season-name">JPred 2026&ndash;2027 <span class="tag">Latest</span></span>
+                                <span class="season-meta">J1, J2 &amp; J3 leagues</span>
+                            </div>
+                            <span class="arrow" aria-hidden="true">&rarr;</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a class="season-link" href="2026/">
+                            <div class="season-body">
+                                <span class="season-name">JPred 2026</span>
+                                <span class="season-meta">100-Year Vision regional competition</span>
+                            </div>
+                            <span class="arrow" aria-hidden="true">&rarr;</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a class="season-link" href="2025/">
+                            <div class="season-body">
+                                <span class="season-name">JPred 2025</span>
+                                <span class="season-meta">Top three divisions</span>
+                            </div>
+                            <span class="arrow" aria-hidden="true">&rarr;</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a class="season-link" href="2024/">
+                            <div class="season-body">
+                                <span class="season-name">JPred 2024</span>
+                                <span class="season-meta">Top three divisions</span>
+                            </div>
+                            <span class="arrow" aria-hidden="true">&rarr;</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </main>
+
+        <footer class="site-footer">
+            <p><a href="https://jpred.football/">jpred.football</a></p>
+        </footer>
     </div>
 </body>
 </html>
