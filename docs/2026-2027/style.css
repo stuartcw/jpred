@@ -288,12 +288,27 @@ tr:hover {
 
 .standings-table {
     width: 100%;
-    font-size: 0.78em;
+    font-size: 0.72em;
+    table-layout: fixed;
 }
 
 .standings-table th,
 .standings-table td {
-    padding: 3px 6px;
+    padding: 3px 4px;
+}
+
+/* Pos/Pld/GD/Pts stay narrow and fixed; Team gets whatever's left and wraps
+   rather than truncating, so full team names always stay visible. */
+.standings-table th:nth-child(1), .standings-table td:nth-child(1),
+.standings-table th:nth-child(3), .standings-table td:nth-child(3),
+.standings-table th:nth-child(4), .standings-table td:nth-child(4),
+.standings-table th:nth-child(5), .standings-table td:nth-child(5) {
+    width: 12%;
+}
+
+.standings-table td.left {
+    white-space: normal;
+    word-break: break-word;
 }
 
 .widget-empty {
