@@ -1,0 +1,6 @@
+{
+  "name": "JPred",
+  "description": "Predict the top and bottom clubs in the J.League",
+  "path": "/jpred/",
+  "source": "~/Code/Python/jpred"
+}
